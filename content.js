@@ -1,8 +1,8 @@
 // content.js
-function pageScroll() {
-    //works on some sites but not FB, Twitter, basicanalogcircuits
-    window.scrollBy(0,10);
+var speed = 10;
 
+function pageScroll() {
+    window.scrollBy(0,speed);
     scrolldelay = setTimeout(pageScroll,10);
 }
 
