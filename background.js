@@ -6,3 +6,27 @@ chrome.browserAction.onClicked.addListener(function(tab) {
     chrome.tabs.sendMessage(activeTab.id, {"message": "clicked_browser_action"});
   });
 });
+
+// Post req to our server
+function saveData(obj){
+	$.ajax({
+		url: 'http://jas920.itp.io:1990/chromesubmit',
+		type: 'POST',
+		contentType: 'application/json',
+		data: JSON.stringify(obj),
+		error: function(resp){
+			console.log("Oh no...");
+			console.log(resp);
+		},
+		success: function(resp){
+			console.log('WooHoo!');
+			console.log(resp);
+		}
+	});
+}
+
+// listen for data to send to server
+var port = chrome.runtime.connect({name: "sendToAPI"});
+port.onMessage.addListener(function(msg) {
+  saveData(msg);
+});

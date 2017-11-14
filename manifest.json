@@ -2,7 +2,9 @@
   "manifest_version": 2,
   "name": "Scroller",
   "version": "0.1",
+  "permissions": ["http://jas920.itp.io/*", "https://jas920.itp.io/*"],
   "background": {
+    "persistent": true,
     "scripts": ["background.js"]
   },
   "content_scripts": [
