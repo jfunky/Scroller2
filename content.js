@@ -9,7 +9,7 @@ function pageScroll(speed) {
 // GET request from our server
 function getSpeed(){
 	$.ajax({
-		url: 'http://jas920.itp.io:1990/',
+		url: 'https://jas920.itp.io:443/',
 		type: 'GET',
 		dataType: 'json',
 		error: function(data){
@@ -26,34 +26,41 @@ function getSpeed(){
 	});
 }
 
-function toBackground(){
-  var port = chrome.runtime.connect({name: "sendToAPI"});
-  port.postMessage({"location": window.scrollY});
+function saveData(obj){
+	$.ajax({
+		url: 'https://jas920.itp.io:443/chromesubmit',
+		type: 'POST',
+		data: JSON.stringify(obj),
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+		error: function(resp){
+			console.log("Oh no...");
+			console.log(resp);
+		},
+		success: function(resp){
+			console.log('WooHoo!');
+			console.log(resp);
+		}
+	});
 }
 
 function funcTimer(){
+  pagePos = window.scrollY;
+  var pageData = new Object();
+	pageData.data = pagePos;
+
+  console.log(pageData);
   getSpeed();       // call getSpeed on an interval
-  toBackground();   // send data to background
+  saveData(pageData);   // send data to background
 }
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if( request.message === "clicked_browser_action" ) {
 
-      setInterval(funcTimer,10);
-
-      // ajax happens but data doesn't send - tried sending from background.js
-      // saveData({"data": window.scrollY});
-
-      // need to figure out thresholds
-      // if ((Math.abs($(document).height() - ($(window).height() + $(window).scrollTop()))) < 5 ) {
-      //    alert("bottom!");
-      //    console.log(window.scrollY);
-      // }
+      //setInterval(funcTimer, 10);
+      setInterval(getSpeed, 10);
 
     } // if clicked browser close
   } // function
 ); // addListener
-
-// console.log(window.scrollY);
-// console.log($(window).height());

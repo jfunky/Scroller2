@@ -10,8 +10,8 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 // Post req to our server
 function saveData(obj){
 	$.ajax({
-		url: 'http://jas920.itp.io:1990/chromesubmit',
-		type: 'POST',
+		url: 'https://jas920.itp.io:1990/chromesubmit',
+		type: 'GET',
 		contentType: 'application/json',
 		data: JSON.stringify(obj),
 		error: function(resp){
