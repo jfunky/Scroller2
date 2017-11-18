@@ -18,8 +18,9 @@ var app = express();					  // create a server using express
 var bodyParser = require('body-parser');
 var urlencodedParser = bodyParser.urlencoded({ extended: true }); // for parsing form data
 
+
 // https stuff
-// app.use('*', httpRedirect);              // set a redirect function for http
+app.use('*', httpRedirect);              // set a redirect function for http
 app.use('/',express.static('public'));   // set a static file directory
 
 // bodyParser stuff
