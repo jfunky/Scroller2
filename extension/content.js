@@ -1,13 +1,22 @@
 // content.js - do things in the browser
 
 //define scroll function
-function pageScroll(speed) {
-    window.scrollBy(0,speed);
-    scrolldelay = setTimeout(pageScroll,10);
+function pageScroll(direction) {
+  let movement;
+  if(direction == 'down'){
+     movement = +100;
+   } else {
+     movement = -100;
+  }
+  window.scrollBy({
+    top: movement,
+    left: 0,
+    behavior: 'smooth'
+  });
 }
 
 // GET request from our server
-function getSpeed(){
+function getData(){
 	$.ajax({
 		url: 'https://jas920.itp.io:443/',
 		type: 'GET',
@@ -19,47 +28,19 @@ function getSpeed(){
 		success: function(data){
 			console.log("SUCCESS");
       // page scroll when state is true
-      if (data.data.state) {
-        pageScroll(data.data.speed) ;
+      if (data.data.direction) {
+        pageScroll(data.data.direction) ;
       }
 		}
 	});
 }
 
-function saveData(obj){
-	$.ajax({
-		url: 'https://jas920.itp.io:443/chromesubmit',
-		type: 'POST',
-		data: JSON.stringify(obj),
-    contentType: "application/json; charset=utf-8",
-    dataType: "json",
-		error: function(resp){
-			console.log("Oh no...");
-			console.log(resp);
-		},
-		success: function(resp){
-			console.log('WooHoo!');
-			console.log(resp);
-		}
-	});
-}
-
-function funcTimer(){
-  pagePos = window.scrollY;
-  var pageData = new Object();
-	pageData.data = pagePos;
-
-  console.log(pageData);
-  getSpeed();       // call getSpeed on an interval
-  saveData(pageData);   // send data to background
-}
-
+//function called when activated by chrome extension being clicked
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if( request.message === "clicked_browser_action" ) {
 
-      //setInterval(funcTimer, 10);
-      setInterval(getSpeed, 10);
+      setInterval(getData, 10);
 
     } // if clicked browser close
   } // function
