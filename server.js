@@ -7,7 +7,7 @@
 
   based on code by Tom Igoe
 	created 12 Nov 2017
-  modified 16 Nov 2017
+  modified 21 Nov 2017
 */
 // include libraries and declare global variables:
 var express = require('express');	// include the express library
@@ -19,7 +19,7 @@ var bodyParser = require('body-parser');
 var urlencodedParser = bodyParser.urlencoded({ extended: true }); // for parsing form data
 
 
-// https stuff
+/// https stuff
 app.use('*', httpRedirect);              // set a redirect function for http
 app.use('/',express.static('public'));   // set a static file directory
 
@@ -33,86 +33,54 @@ app.use(function(req, res, next) {
   next();
 });
 
-// test API data
-var webdata = [{
-  "top": false,
-  "bottom": true,
-  "location": 900
-}];
-var physdata = [{"state": true,
-                 "speed": 9
-}];
-
-// when we get data from the chrome extension
-app.post('/chromesubmit', function (req, res) {
-	console.log("They posted " + req);
-
-	// var chromedata = new Object();
-	// chromedata.top = req.data.top ;
-	// chromedata.bottom = req.data.bottom ;
-  // chromedata.location = req.data.location ;
-	// webdata.push(chromedata);
-});
+// API data (final structure)
+var physdata = {
+  "state": true,
+  "speed": 10,
+  "direction": 'up'
+};
 
 // when we get data from the physical controller
 app.post('/submit', function (req, res) {
-  // req. ... is however they're sending us data
-	//console.log("They posted " + req.data.state + "and" + req.data.speed);
-
-	var newdata = new Object();
-	newdata.state = req.data.state;
-	newdata.speed = req.data.speed;
-	physdata.push(newdata);
+  physdata.state = req.body.state;
+  physdata.speed = req.body.speed;
+  physdata.direction = req.body.direction;
+  res.json(physdata);
 });
 
-//this route can serve the most recent data
+//this route can serve all the data
 app.get('/', function(req, res) {
 
-  // or should we use res.send?
-  res.json({"alive": "true",
+  // send json
+  res.json({"api_status": "ok",
             "data": {
-              "state": physdata[0].state,
-              "speed": physdata[0].speed,
-              "position":{
-                "top": webdata[0].top,
-                "bottom": webdata[0].bottom,
-                "location": webdata[0].location
-              }
+              "state": physdata.state,
+              "speed": physdata.speed,
+              "direction": physdata.direction
             }
           });
 
-  console.log("Got a request for /");
+  // console.log("Got a request for /");
 });
 
-app.get('/alive', function(req, res) {
-	// res.send({"alive": "true"});
-  res.json({"alive": "true"});
+
+app.get('/api_status', function(req, res) {
+  res.json({"api_status": "ok"});
 });
 
 app.get('/state', function(req, res) {
-  // res.send({"state": physdata[0].state});
-  res.json({"state": physdata[0].state});
+  res.json({"state": physdata.state});
 });
 
 app.get('/speed', function(req, res) {
-  // res.send({"speed": physdata[0].speed});
-  res.json({"speed": physdata[0].speed});
+  res.json({"speed": physdata.speed});
 });
 
-app.get('/top', function(req, res) {
-  res.json({"top": webdata[0].top});
-});
-
-app.get('/bottom', function(req, res) {
-  res.json({"bottom": webdata[0].bottom});
-});
-
-app.get('/location', function(req, res) {
-  res.json({"location": webdata[0].location});
+app.get('/direction', function(req, res) {
+  res.json({"direction": physdata.direction});
 });
 
 // replace with https
-// app.listen(1992);
 console.log("Server is running on port 1990");
 function httpRedirect(request,response, next) {
   if (!request.secure) {
